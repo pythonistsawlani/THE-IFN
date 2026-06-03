@@ -2,9 +2,9 @@ export type CollegeEventCategory =
   | 'hackathon'
   | 'ideathon'
   | 'workshop'
-  | 'seminar'
-  | 'demoday'
-  | 'mentorship'
+  | 'startup_seminar'
+  | 'innovation_challenge'
+  | 'incubation_event'
   | 'deadline'
   | 'other';
 
@@ -45,28 +45,28 @@ export const COLLEGE_EVENT_CATEGORIES: Record<
     dotColor: '#c2410c',
     icon: 'Wrench',
   },
-  seminar: {
-    label: 'Seminar / Talk',
+  startup_seminar: {
+    label: 'Startup Seminar',
     bgVar: 'var(--cal-seminar-bg)',
     borderVar: 'var(--cal-seminar-border)',
     textVar: 'var(--cal-seminar-text)',
     dotColor: '#15803d',
     icon: 'Mic',
   },
-  demoday: {
-    label: 'Demo Day',
-    bgVar: 'var(--cal-demoday-bg)',
-    borderVar: 'var(--cal-demoday-border)',
-    textVar: 'var(--cal-demoday-text)',
-    dotColor: '#b45309',
-    icon: 'Presentation',
+  innovation_challenge: {
+    label: 'Innovation Challenge',
+    bgVar: 'var(--post-status-failure-bg)',
+    borderVar: 'var(--post-status-failure-border)',
+    textVar: 'var(--post-status-failure-indicator)',
+    dotColor: '#dc2626',
+    icon: 'Target',
   },
-  mentorship: {
-    label: 'Mentorship',
+  incubation_event: {
+    label: 'Incubation Event',
     bgVar: 'var(--cal-hackathon-bg)',
     borderVar: 'var(--cal-hackathon-border)',
     textVar: 'var(--cal-hackathon-text)',
-    dotColor: '#0891b2',
+    dotColor: '#0d9488',
     icon: 'Users',
   },
   deadline: {

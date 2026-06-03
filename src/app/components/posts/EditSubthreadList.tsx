@@ -4,9 +4,10 @@ import { PostEditEntry } from '../../../store/useAppStore';
 interface EditSubthreadProps {
   entry: PostEditEntry;
   isOriginal: boolean;
+  author: string;
 }
 
-export function EditSubthread({ entry, isOriginal }: EditSubthreadProps) {
+export function EditSubthread({ entry, isOriginal, author }: EditSubthreadProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
@@ -14,9 +15,13 @@ export function EditSubthread({ entry, isOriginal }: EditSubthreadProps) {
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2..5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
+          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
             {isOriginal ? '📄 Original post' : `✏️ Edit v${entry.version - 1}`}
           </span>
+          <span className="text-xs text-gray-500 font-medium">
+            by {author}
+          </span>
+          <span className="text-xs text-gray-400">•</span>
           <span className="text-xs text-gray-500">
             {new Date(entry.editedAt).toLocaleString()}
           </span>
@@ -64,9 +69,10 @@ export function EditSubthread({ entry, isOriginal }: EditSubthreadProps) {
 
 interface EditSubthreadListProps {
   editHistory?: PostEditEntry[];
+  author: string;
 }
 
-export function EditSubthreadList({ editHistory }: EditSubthreadListProps) {
+export function EditSubthreadList({ editHistory, author }: EditSubthreadListProps) {
   if (!editHistory || editHistory.length === 0) return null;
 
   const sorted = [...editHistory].sort((a, b) => a.version - b.version);
@@ -87,6 +93,7 @@ export function EditSubthreadList({ editHistory }: EditSubthreadListProps) {
             key={entry.version}
             entry={entry}
             isOriginal={entry.version === 1}
+            author={author}
           />
         ))}
       </div>

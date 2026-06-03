@@ -40,6 +40,7 @@ export function Login() {
   const login = useAppStore((state) => state.login);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -104,10 +105,18 @@ export function Login() {
         </div>
 
         <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" className="rounded border-gray-300" />
+          <label className="flex items-center gap-2 text-sm cursor-pointer">
+            <input 
+              type="checkbox" 
+              className="rounded border-gray-300"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+            />
             <span className="text-gray-700">Remember me</span>
           </label>
+          <Link to="/forgot-password" className="text-sm text-[#0033A0] hover:underline">
+            Forgot password?
+          </Link>
         </div>
 
         <Button

@@ -3,6 +3,7 @@ import { MainLayout } from './components/layouts/MainLayout';
 import { AuthLayout } from './components/layouts/AuthLayout';
 import { Login } from './pages/auth/Login';
 import { Register } from './pages/auth/Register';
+import { ForgotPassword } from './pages/auth/ForgotPassword';
 import { Dashboard } from './pages/Dashboard';
 import { Feed } from './pages/Feed';
 import { CreatePost } from './pages/posts/CreatePost';
@@ -38,6 +39,7 @@ export default function App() {
         <Route element={<AuthLayout />}>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
         </Route>
 
         {/* Main App Routes */}

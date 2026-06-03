@@ -1,4 +1,4 @@
-export type PostStatusTag = 'success' | 'failure' | null;
+export type PostStatusTag = 'success' | 'failure' | 'under_review' | null;
 
 export function getPostStatusClasses(statusTag?: PostStatusTag): {
   containerClasses: string;
@@ -24,6 +24,15 @@ export function getPostStatusClasses(statusTag?: PostStatusTag): {
     };
   }
 
+  if (statusTag === 'under_review') {
+    return {
+      containerClasses: 'bg-[var(--post-status-under-review-bg)]',
+      borderClasses: 'border-l-4 border-l-[var(--post-status-under-review-indicator)]',
+      badgeClasses: 'bg-slate-100 text-slate-700 border border-slate-200',
+      badgeLabel: '⏳ Under Review',
+    };
+  }
+
   return {
     containerClasses: '',
     borderClasses: '',
@@ -36,5 +45,6 @@ export function deriveStatusTag(tags: string[] = []): PostStatusTag {
   const lowerTags = tags.map((t) => t.toLowerCase());
   if (lowerTags.includes('success')) return 'success';
   if (lowerTags.includes('failure')) return 'failure';
+  if (lowerTags.includes('under review') || lowerTags.includes('under_review')) return 'under_review';
   return null;
 }

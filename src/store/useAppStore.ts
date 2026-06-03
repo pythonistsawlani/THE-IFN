@@ -26,7 +26,7 @@ export type Post = {
   trending: boolean;
   likedByMe?: boolean;
   bookmarkedByMe?: boolean;
-  statusTag?: 'success' | 'failure' | null;
+  statusTag?: 'success' | 'failure' | 'under_review' | null;
   editHistory?: PostEditEntry[];
   isEdited?: boolean;
   lastEditedAt?: string;
@@ -42,10 +42,12 @@ export type Event = {
   type: string;
   isOnline: boolean;
   registered: boolean;
-  category?: string;
   startTime?: string;
   endTime?: string;
   venue?: string;
+  category?: 'Hackathon' | 'Ideathon' | 'Workshop' | 'Startup Seminar' | 'Innovation Challenge' | 'Incubation Event';
+  organizer?: string;
+  registrationLink?: string;
 };
 
 export type Idea = {
@@ -229,8 +231,8 @@ const initialIdeas: Idea[] = [
 ];
 
 const initialEvents: Event[] = [
-  { id: 1, title: 'Startup Pitch Night', description: 'Pitch your idea to local investors.', date: '2026-06-10', time: '18:00', location: 'Main Campus Auditorium', type: 'Pitch', isOnline: false, registered: false, category: 'demoday' },
-  { id: 2, title: 'Tech Founder Mixer', description: 'Meet other tech founders.', date: '2026-06-15', time: '19:00', location: 'Zoom', type: 'Networking', isOnline: true, registered: false, category: 'seminar' },
+  { id: 1, title: 'Startup Pitch Night', description: 'Pitch your idea to local investors.', date: '2026-06-10', time: '18:00', location: 'Main Campus Auditorium', type: 'In-person', isOnline: false, registered: false, category: 'startup_seminar', organizer: 'IFN Team', registrationLink: 'https://example.com/register/pitch-night' },
+  { id: 2, title: 'Tech Founder Mixer', description: 'Meet other tech founders.', date: '2026-06-15', time: '19:00', location: 'Zoom', type: 'Virtual', isOnline: true, registered: false, category: 'incubation_event', organizer: 'Alumni Network' },
 ];
 
 const initialProblems: Problem[] = [

@@ -14,7 +14,7 @@ export function Calendar() {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   const [newEvent, setNewEvent] = useState({ 
-    title: '', description: '', date: '', time: '', location: '', type: 'Event', isOnline: false, category: 'other' 
+    title: '', description: '', date: '', time: '', location: '', type: 'Event', isOnline: false, category: 'other', organizer: '', registrationLink: ''
   });
 
   const handleCreateSubmit = (e: React.FormEvent) => {
@@ -26,7 +26,7 @@ export function Calendar() {
     addEvent(newEvent);
     setShowCreateModal(false);
     toast.success('Event created successfully');
-    setNewEvent({ title: '', description: '', date: '', time: '', location: '', type: 'Event', isOnline: false, category: 'other' });
+    setNewEvent({ title: '', description: '', date: '', time: '', location: '', type: 'Event', isOnline: false, category: 'other', organizer: '', registrationLink: '' });
   };
 
   const handleRegister = (id: number) => {
@@ -240,6 +240,16 @@ export function Calendar() {
                   <label className="block text-sm font-medium mb-1">Location / Link</label>
                   <input className="w-full border p-2 rounded" value={newEvent.location} onChange={e => setNewEvent({...newEvent, location: e.target.value})} />
                 </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Organizer</label>
+                    <input className="w-full border p-2 rounded" placeholder="e.g. IFN Team" value={newEvent.organizer} onChange={e => setNewEvent({...newEvent, organizer: e.target.value})} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Registration Link</label>
+                    <input className="w-full border p-2 rounded" placeholder="e.g. https://..." value={newEvent.registrationLink} onChange={e => setNewEvent({...newEvent, registrationLink: e.target.value})} />
+                  </div>
+                </div>
                 <div>
                   <label className="flex items-center gap-2 text-sm font-medium">
                     <input type="checkbox" checked={newEvent.isOnline} onChange={e => setNewEvent({...newEvent, isOnline: e.target.checked})} />
@@ -290,9 +300,24 @@ export function Calendar() {
                   <MapPin className="w-5 h-5 text-[#0033A0]" />
                   <span className="font-medium">{selectedEvent.location} {selectedEvent.isOnline ? '(Online)' : ''}</span>
                 </div>
+                {selectedEvent.organizer && (
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Users className="w-5 h-5 text-[#0033A0]" />
+                    <span className="font-medium">Organized by {selectedEvent.organizer}</span>
+                  </div>
+                )}
               </div>
 
               <div className="pt-4 border-t border-gray-100 flex gap-4">
+                {selectedEvent.registrationLink && (
+                  <Button 
+                    variant="outline"
+                    className="flex-1 cursor-pointer"
+                    onClick={() => window.open(selectedEvent.registrationLink, '_blank')}
+                  >
+                    External Registration
+                  </Button>
+                )}
                 <Button 
                   onClick={() => handleRegister(selectedEvent.id)}
                   disabled={selectedEvent.registered}

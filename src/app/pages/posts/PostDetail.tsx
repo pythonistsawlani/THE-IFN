@@ -293,7 +293,9 @@ export function PostDetail() {
 
           {/* Edit History Subthreads */}
           {post.editHistory && post.editHistory.length > 0 && (
-            <EditSubthreadList editHistory={post.editHistory} />
+            <div className="mt-8">
+              <EditSubthreadList editHistory={post.editHistory} author={post.author} />
+            </div>
           )}
         </CardContent>
       </Card>
