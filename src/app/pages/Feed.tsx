@@ -65,7 +65,9 @@ export function Feed() {
   );
 }
 
-function PostCard({ post, navigate }: { post: Post; navigate: any }) {
+import { deriveStatusTag, getPostStatusClasses } from '../../utils/postStatus.utils';
+
+function PostCard({ post, navigate, statusTag }: { post: Post; navigate: any; statusTag?: 'success' | 'failure' | null }) {
   const { togglePostLike, togglePostBookmark } = useAppStore();
 
   const handleLike = (e: React.MouseEvent) => {
@@ -89,8 +91,11 @@ function PostCard({ post, navigate }: { post: Post; navigate: any }) {
     toast.success(post.bookmarkedByMe ? 'Bookmark removed' : 'Post bookmarked');
   };
 
+  const derivedTag = statusTag ?? deriveStatusTag(post.tags);
+  const { containerClasses, borderClasses, badgeClasses, badgeLabel } = getPostStatusClasses(derivedTag);
+
   return (
-    <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/posts/${post.id}`)}>
+    <Card className={`hover:shadow-lg transition-shadow cursor-pointer ${containerClasses} ${borderClasses}`} onClick={() => navigate(`/posts/${post.id}`)}>
       <CardContent className="p-6">
         {/* Author Info */}
         <div className="flex items-center gap-3 mb-4">
@@ -114,12 +119,17 @@ function PostCard({ post, navigate }: { post: Post; navigate: any }) {
         <p className="text-gray-700 mb-4">{post.content}</p>
 
         {/* Tags */}
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="flex flex-wrap gap-2 mb-4 items-center">
           {post.tags.map((tag) => (
             <Badge key={tag} variant="outline" className="text-[#0033A0] border-[#0033A0]">
               {tag}
             </Badge>
           ))}
+          {badgeLabel && (
+            <span className={`inline-flex items-center text-xs font-medium px-2.5 py-0.5 rounded-full ${badgeClasses} ml-2`}>
+              {badgeLabel}
+            </span>
+          )}
         </div>
 
         {/* Actions */}

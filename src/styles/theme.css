@@ -44,6 +44,31 @@
   --ifn-red: #E8002D;
   --ifn-blue: #0033A0;
   --ifn-white: #FFFFFF;
+
+  /* Feature 2: Post status backgrounds */
+  --post-status-success-bg: #f0fdf4;        /* green-50 — very light, not garish */
+  --post-status-success-border: #bbf7d0;    /* green-200 */
+  --post-status-success-indicator: #16a34a; /* green-600 */
+  --post-status-failure-bg: #fff1f2;        /* rose-50 — very light */
+  --post-status-failure-border: #fecdd3;    /* rose-200 */
+  --post-status-failure-indicator: #e11d48; /* rose-600 */
+
+  /* Feature 4: Calendar event category colors */
+  --cal-hackathon-bg: #eff6ff;
+  --cal-hackathon-border: #93c5fd;
+  --cal-hackathon-text: #1d4ed8;
+  --cal-ideathon-bg: #fdf4ff;
+  --cal-ideathon-border: #e879f9;
+  --cal-ideathon-text: #a21caf;
+  --cal-workshop-bg: #fff7ed;
+  --cal-workshop-border: #fdba74;
+  --cal-workshop-text: #c2410c;
+  --cal-seminar-bg: #f0fdf4;
+  --cal-seminar-border: #86efac;
+  --cal-seminar-text: #15803d;
+  --cal-demoday-bg: #fffbeb;
+  --cal-demoday-border: #fcd34d;
+  --cal-demoday-text: #b45309;
 }
 
 .dark {

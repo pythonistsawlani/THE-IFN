@@ -28,6 +28,8 @@ import { Search } from './pages/Search';
 import { Settings } from './pages/Settings';
 import { NotFound } from './pages/NotFound';
 
+import { AuthGuard } from './components/auth/AuthGuard';
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -39,7 +41,7 @@ export default function App() {
         </Route>
 
         {/* Main App Routes */}
-        <Route element={<MainLayout />}>
+        <Route element={<AuthGuard><MainLayout /></AuthGuard>}>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/feed" element={<Feed />} />

@@ -1,5 +1,18 @@
 import { create } from 'zustand';
 
+export interface PostEditEntry {
+  version: number;
+  content: {
+    title: string;
+    content: string;
+    problemStatement?: string;
+    solution?: string;
+    startupName?: string;
+  };
+  editedAt: string;
+  editNote?: string;
+}
+
 export type Post = {
   id: number;
   author: string;
@@ -13,6 +26,10 @@ export type Post = {
   trending: boolean;
   likedByMe?: boolean;
   bookmarkedByMe?: boolean;
+  statusTag?: 'success' | 'failure' | null;
+  editHistory?: PostEditEntry[];
+  isEdited?: boolean;
+  lastEditedAt?: string;
 };
 
 export type Event = {
@@ -25,6 +42,10 @@ export type Event = {
   type: string;
   isOnline: boolean;
   registered: boolean;
+  category?: string;
+  startTime?: string;
+  endTime?: string;
+  venue?: string;
 };
 
 export type Idea = {
@@ -75,11 +96,13 @@ export type Autopsy = {
 };
 
 export type User = {
-  id: number;
+  id: number | string;
   name: string;
   email: string;
   role: string;
   status: string;
+  avatar?: string;
+  startupName?: string;
 };
 
 export type Tag = {
@@ -97,11 +120,19 @@ type AppStore = {
   users: User[];
   tags: Tag[];
   
+  // Auth state
+  currentUser: User | null;
+  isAuthenticated: boolean;
+  login: (user: User) => void;
+  logout: () => void;
+  signup: (user: User) => void;
+  
   // Actions
   togglePostLike: (id: number) => void;
   togglePostBookmark: (id: number) => void;
   addPostComment: (id: number) => void;
   addPost: (post: Omit<Post, 'id' | 'likes' | 'comments' | 'time' | 'trending'>) => void;
+  editPost: (id: number, updatedFields: Partial<Post>) => void;
   
   registerForEvent: (id: number) => void;
   addEvent: (event: Omit<Event, 'id' | 'registered'>) => void;
@@ -122,8 +153,8 @@ type AppStore = {
   addAutopsy: (autopsy: Omit<Autopsy, 'id' | 'upvotes'>) => void;
   
   addUser: (user: Omit<User, 'id'>) => void;
-  updateUserRole: (id: number, role: string) => void;
-  toggleUserStatus: (id: number) => void;
+  updateUserRole: (id: number | string, role: string) => void;
+  toggleUserStatus: (id: number | string) => void;
   
   addTag: (name: string) => void;
   deleteTag: (id: number) => void;
@@ -198,8 +229,8 @@ const initialIdeas: Idea[] = [
 ];
 
 const initialEvents: Event[] = [
-  { id: 1, title: 'Startup Pitch Night', description: 'Pitch your idea to local investors.', date: '2026-06-10', time: '18:00', location: 'Main Campus Auditorium', type: 'Pitch', isOnline: false, registered: false },
-  { id: 2, title: 'Tech Founder Mixer', description: 'Meet other tech founders.', date: '2026-06-15', time: '19:00', location: 'Zoom', type: 'Networking', isOnline: true, registered: false },
+  { id: 1, title: 'Startup Pitch Night', description: 'Pitch your idea to local investors.', date: '2026-06-10', time: '18:00', location: 'Main Campus Auditorium', type: 'Pitch', isOnline: false, registered: false, category: 'demoday' },
+  { id: 2, title: 'Tech Founder Mixer', description: 'Meet other tech founders.', date: '2026-06-15', time: '19:00', location: 'Zoom', type: 'Networking', isOnline: true, registered: false, category: 'seminar' },
 ];
 
 const initialProblems: Problem[] = [
@@ -240,6 +271,17 @@ export const useAppStore = create<AppStore>((set) => ({
   users: initialUsers,
   tags: initialTags,
 
+  // Auth initial state & actions
+  currentUser: null,
+  isAuthenticated: false,
+  login: (user) => set({ currentUser: user, isAuthenticated: true }),
+  logout: () => set({ currentUser: null, isAuthenticated: false }),
+  signup: (user) => set((state) => ({
+    currentUser: user,
+    isAuthenticated: true,
+    users: [...state.users, user]
+  })),
+
   togglePostLike: (id) => set((state) => ({
     posts: state.posts.map(p => {
       if (p.id === id) {
@@ -257,6 +299,9 @@ export const useAppStore = create<AppStore>((set) => ({
   })),
   addPost: (post) => set((state) => ({
     posts: [{ ...post, id: Date.now(), likes: 0, comments: 0, time: 'Just now', trending: false }, ...state.posts]
+  })),
+  editPost: (id, updatedFields) => set((state) => ({
+    posts: state.posts.map(p => p.id === id ? { ...p, ...updatedFields } : p)
   })),
 
   registerForEvent: (id) => set((state) => ({

@@ -1,7 +1,8 @@
-import { Bell, Search, Menu, User } from 'lucide-react';
+import { Bell, Search, Menu, User, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
+import { useAppStore } from '../../../store/useAppStore';
 
 interface HeaderProps {
   onToggleSidebar: () => void;
@@ -9,6 +10,12 @@ interface HeaderProps {
 
 export function Header({ onToggleSidebar }: HeaderProps) {
   const navigate = useNavigate();
+  const logout = useAppStore((state) => state.logout);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 z-50">
@@ -64,8 +71,19 @@ export function Header({ onToggleSidebar }: HeaderProps) {
             size="icon"
             className="hover:bg-gray-100"
             onClick={() => navigate('/profile')}
+            title="Profile"
           >
             <User className="w-5 h-5" />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hover:bg-gray-100 text-red-600 hover:text-red-700"
+            onClick={handleLogout}
+            title="Sign Out"
+          >
+            <LogOut className="w-5 h-5" />
           </Button>
         </div>
       </div>

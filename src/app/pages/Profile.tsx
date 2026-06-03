@@ -6,6 +6,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs'
 import { useAppStore } from '../../store/useAppStore';
 import { useNavigate } from 'react-router';
 
+import { deriveStatusTag, getPostStatusClasses } from '../../utils/postStatus.utils';
+
 const userProfile = {
   name: 'Sarah Chen', // Assuming currently logged in user is Sarah Chen
   email: 'sarah@example.com',
@@ -96,16 +98,27 @@ export function Profile() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {userPosts.map((post) => (
-                  <div key={post.id} className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate(`/posts/${post.id}`)}>
-                    <h3 className="font-semibold text-gray-900 mb-2">{post.title}</h3>
-                    <div className="flex items-center gap-4 text-sm text-gray-600">
-                      <span>{post.likes} likes</span>
-                      <span>{post.comments} comments</span>
-                      <span className="ml-auto">{post.time}</span>
+                {userPosts.map((post) => {
+                  const derivedTag = deriveStatusTag(post.tags);
+                  const { containerClasses, borderClasses, badgeClasses, badgeLabel } = getPostStatusClasses(derivedTag);
+                  return (
+                    <div key={post.id} className={`p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer ${containerClasses} ${borderClasses}`} onClick={() => navigate(`/posts/${post.id}`)}>
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-semibold text-gray-900">{post.title}</h3>
+                        {badgeLabel && (
+                          <span className={`inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full ${badgeClasses}`}>
+                            {badgeLabel}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-4 text-sm text-gray-600">
+                        <span>{post.likes} likes</span>
+                        <span>{post.comments} comments</span>
+                        <span className="ml-auto">{post.time}</span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
                 {userPosts.length === 0 && (
                   <p className="text-gray-500 text-center py-4">No posts yet.</p>
                 )}

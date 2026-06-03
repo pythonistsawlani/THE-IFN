@@ -5,6 +5,8 @@ import { Badge } from '../components/ui/badge';
 import { Calendar as CalendarIcon, Clock, MapPin, Users, X } from 'lucide-react';
 import { useAppStore, Event } from '../../store/useAppStore';
 import { toast } from 'sonner';
+import { COLLEGE_EVENT_CATEGORIES, CollegeEventCategory } from '../../features/calendar/constants/collegeEvents';
+import { EventTypeLegend } from '../../features/calendar/components/EventTypeLegend';
 
 export function Calendar() {
   const { events, addEvent, registerForEvent } = useAppStore();
@@ -12,7 +14,7 @@ export function Calendar() {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   const [newEvent, setNewEvent] = useState({ 
-    title: '', description: '', date: '', time: '', location: '', type: 'Event', isOnline: false 
+    title: '', description: '', date: '', time: '', location: '', type: 'Event', isOnline: false, category: 'other' 
   });
 
   const handleCreateSubmit = (e: React.FormEvent) => {
@@ -24,7 +26,7 @@ export function Calendar() {
     addEvent(newEvent);
     setShowCreateModal(false);
     toast.success('Event created successfully');
-    setNewEvent({ title: '', description: '', date: '', time: '', location: '', type: 'Event', isOnline: false });
+    setNewEvent({ title: '', description: '', date: '', time: '', location: '', type: 'Event', isOnline: false, category: 'other' });
   };
 
   const handleRegister = (id: number) => {
@@ -45,11 +47,14 @@ export function Calendar() {
         </div>
         <Button 
           onClick={() => setShowCreateModal(true)}
-          className="bg-gradient-to-r from-[#E8002D] to-[#0033A0] hover:opacity-90 text-white"
+          className="bg-gradient-to-r from-[#E8002D] to-[#0033A0] hover:opacity-90 text-white cursor-pointer"
         >
           Create Event
         </Button>
       </div>
+
+      {/* Categories Legend */}
+      <EventTypeLegend />
 
       {/* Calendar View */}
       <Card>
@@ -69,21 +74,41 @@ export function Calendar() {
               </div>
             ))}
             {Array.from({ length: 30 }, (_, i) => i + 1).map((day) => {
-              // Find events for this day (mocked simply by matching date endsWith)
-              const dayEvents = events.filter(e => e.date.endsWith(`-${day.toString().padStart(2, '0')}`) || day === 15 || day === 10);
+              // Find events for this day
+              const dayEvents = events.filter(e => e.date.endsWith(`-${day.toString().padStart(2, '0')}`) || (day === 15 && e.id === 2) || (day === 10 && e.id === 1));
               
               return (
                 <div
                   key={day}
-                  className={`p-3 rounded-lg hover:bg-gray-100 cursor-pointer flex flex-col items-center justify-start min-h-[80px] ${
+                  className={`p-3 rounded-lg hover:bg-gray-100 cursor-pointer flex flex-col items-center justify-start min-h-[100px] ${
                     day === 2 ? 'bg-[#0033A0] text-white' : 'bg-gray-50 border border-gray-100'
                   }`}
+                  onClick={() => {
+                    if (dayEvents.length > 0) {
+                      setSelectedEvent(dayEvents[0]);
+                    }
+                  }}
                 >
-                  <span>{day}</span>
-                  <div className="mt-2 space-y-1 w-full">
-                    {dayEvents.map(e => (
-                       <div key={e.id} className="w-full h-1.5 bg-blue-500 rounded-full" title={e.title}></div>
-                    ))}
+                  <span className="font-semibold text-sm mb-1">{day}</span>
+                  <div className="mt-1 space-y-1.5 w-full">
+                    {dayEvents.map(e => {
+                      const cat = e.category || 'other';
+                      const config = COLLEGE_EVENT_CATEGORIES[cat as CollegeEventCategory] || COLLEGE_EVENT_CATEGORIES.other;
+                      return (
+                        <div 
+                          key={e.id} 
+                          className="w-full text-[10px] px-1.5 py-0.5 rounded border text-left font-medium truncate"
+                          style={{
+                            backgroundColor: config.bgVar || 'var(--muted)',
+                            borderColor: config.borderVar || 'var(--border)',
+                            color: config.textVar || 'var(--foreground)'
+                          }}
+                          title={e.title}
+                        >
+                          {e.title}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               );
@@ -99,54 +124,70 @@ export function Calendar() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {events.map((event) => (
-              <div
-                key={event.id}
-                onClick={() => setSelectedEvent(event)}
-                className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer bg-white"
-              >
-                <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{event.title}</h3>
-                    <Badge className="bg-blue-100 text-blue-700 mt-1">{event.type}</Badge>
+            {events.map((event) => {
+              const cat = event.category || 'other';
+              const config = COLLEGE_EVENT_CATEGORIES[cat as CollegeEventCategory] || COLLEGE_EVENT_CATEGORIES.other;
+              return (
+                <div
+                  key={event.id}
+                  onClick={() => setSelectedEvent(event)}
+                  className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer bg-white"
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">{event.title}</h3>
+                      <div className="flex flex-wrap gap-2 mt-1.5 items-center">
+                        <Badge className="bg-gray-100 text-gray-700 hover:bg-gray-200 border-transparent">{event.type}</Badge>
+                        <span 
+                          className="text-xs font-semibold px-2.5 py-0.5 rounded-full border"
+                          style={{
+                            backgroundColor: config.bgVar || 'var(--muted)',
+                            borderColor: config.borderVar || 'var(--border)',
+                            color: config.textVar || 'var(--foreground)'
+                          }}
+                        >
+                          {config.label}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <CalendarIcon className="w-4 h-4" />
-                    {event.date}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <CalendarIcon className="w-4 h-4" />
+                      {event.date}
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <Clock className="w-4 h-4" />
+                      {event.time}
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <MapPin className="w-4 h-4" />
+                      {event.location}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <Clock className="w-4 h-4" />
-                    {event.time}
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <MapPin className="w-4 h-4" />
-                    {event.location}
-                  </div>
-                </div>
 
-                <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <Users className="w-4 h-4" />
-                    <span className="text-sm">View details</span>
+                  <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <Users className="w-4 h-4" />
+                      <span className="text-sm">View details</span>
+                    </div>
+                    <Button 
+                      variant={event.registered ? "default" : "outline"}
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (!event.registered) handleRegister(event.id);
+                      }}
+                      disabled={event.registered}
+                      className={event.registered ? 'bg-green-600 hover:bg-green-700 text-white border-transparent cursor-default' : 'cursor-pointer'}
+                    >
+                      {event.registered ? 'Registered' : 'Register'}
+                    </Button>
                   </div>
-                  <Button 
-                    variant={event.registered ? "default" : "outline"}
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!event.registered) handleRegister(event.id);
-                    }}
-                    disabled={event.registered}
-                    className={event.registered ? 'bg-green-600 hover:bg-green-700 text-white border-transparent' : ''}
-                  >
-                    {event.registered ? 'Registered' : 'Register'}
-                  </Button>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </CardContent>
       </Card>
@@ -171,6 +212,20 @@ export function Calendar() {
                   <label className="block text-sm font-medium mb-1">Description</label>
                   <textarea className="w-full border p-2 rounded" value={newEvent.description} onChange={e => setNewEvent({...newEvent, description: e.target.value})} />
                 </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Event Category</label>
+                  <select
+                    className="w-full border p-2 rounded bg-white text-gray-700"
+                    value={newEvent.category}
+                    onChange={e => setNewEvent({...newEvent, category: e.target.value})}
+                  >
+                    {Object.entries(COLLEGE_EVENT_CATEGORIES).map(([key, config]) => (
+                      <option key={key} value={key}>
+                        {config.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-1">Date</label>
@@ -191,7 +246,7 @@ export function Calendar() {
                     Online Event
                   </label>
                 </div>
-                <Button type="submit" className="w-full bg-[#0033A0] text-white">Create</Button>
+                <Button type="submit" className="w-full bg-[#0033A0] text-white cursor-pointer">Create</Button>
               </form>
             </CardContent>
           </Card>
@@ -206,7 +261,21 @@ export function Calendar() {
               <X className="w-5 h-5" />
             </button>
             <CardHeader>
-              <Badge className="w-fit mb-2">{selectedEvent.type}</Badge>
+              <div className="flex flex-wrap gap-2 mb-2 items-center">
+                <Badge>{selectedEvent.type}</Badge>
+                {selectedEvent.category && (
+                  <span 
+                    className="text-xs font-semibold px-2.5 py-0.5 rounded-full border animate-fade-in"
+                    style={{
+                      backgroundColor: (COLLEGE_EVENT_CATEGORIES[selectedEvent.category as CollegeEventCategory] || COLLEGE_EVENT_CATEGORIES.other).bgVar,
+                      borderColor: (COLLEGE_EVENT_CATEGORIES[selectedEvent.category as CollegeEventCategory] || COLLEGE_EVENT_CATEGORIES.other).borderVar,
+                      color: (COLLEGE_EVENT_CATEGORIES[selectedEvent.category as CollegeEventCategory] || COLLEGE_EVENT_CATEGORIES.other).textVar
+                    }}
+                  >
+                    {(COLLEGE_EVENT_CATEGORIES[selectedEvent.category as CollegeEventCategory] || COLLEGE_EVENT_CATEGORIES.other).label}
+                  </span>
+                )}
+              </div>
               <CardTitle className="text-2xl">{selectedEvent.title}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -227,7 +296,7 @@ export function Calendar() {
                 <Button 
                   onClick={() => handleRegister(selectedEvent.id)}
                   disabled={selectedEvent.registered}
-                  className={`flex-1 ${selectedEvent.registered ? 'bg-green-600 text-white' : 'bg-[#E8002D] text-white hover:bg-red-700'}`}
+                  className={`flex-1 cursor-pointer ${selectedEvent.registered ? 'bg-green-600 text-white' : 'bg-[#E8002D] text-white hover:bg-red-700'}`}
                 >
                   {selectedEvent.registered ? 'You are Registered' : 'Register Now'}
                 </Button>
